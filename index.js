@@ -92,7 +92,7 @@ async function run() {
         })
         app.get("/orderCoffee/:email", async(req, res)=>{
             const email = req.params.email;
-            const result = await orders.find({email}).toArray();
+            const result = await orders.find({customerEmail : email}).toArray();
             res.send(result)
         })
 
