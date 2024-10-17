@@ -33,6 +33,7 @@ async function run() {
 
         const coffee = client.db('CoffeeDB').collection('CoffeeForms')
         const userCollection = client.db('CoffeeDB').collection('Users')
+        const orders = client.db('CoffeeDB').collection('Orders')
 
         app.get('/allcoffee', async (req, res) => {
             const cursor = coffee.find()
@@ -72,6 +73,40 @@ async function run() {
             };
             const result = await coffee.updateOne(filter, newCoffee, options)
             res.send(result)
+        })
+
+        
+        //order coffee
+
+        app.post('/orderCoffee', async (req, res) => {
+            const newCoffee = req.body;
+            console.log(newCoffee)
+            const result = await orders.insertOne(newCoffee)
+            res.send(result)
+        })
+
+
+        app.get("/allOrderedCoffees", async(req, res)=>{
+            const result = await orders.find().toArray();
+            res.send(result)
+        })
+        app.get("/orderCoffee/:email", async(req, res)=>{
+            const email = req.params.email;
+            const result = await orders.find({email}).toArray();
+            res.send(result)
+        })
+
+        app.put('/updateOrder/:id', async(req, res)=>{
+            const id = req.params.id;
+            const filter = {_id : new ObjectId(id)};
+            const options = { upsert: true };
+            const newOrder = {
+                $set :{
+                    status : "Confirm"
+                }
+            }
+            const result = await orders.updateOne(filter, newOrder, options);
+            res.send(result);
         })
 
 
