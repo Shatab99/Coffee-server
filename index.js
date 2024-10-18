@@ -75,7 +75,13 @@ async function run() {
             res.send(result)
         })
 
-        
+        app.delete('/addcoffee/:id', async (req, res) => {
+            const id = req.params.id;
+            const result = await coffee.deleteOne({ _id: new ObjectId(id) });
+            res.send(result)
+        })
+
+
         //order coffee
 
         app.post('/orderCoffee', async (req, res) => {
@@ -86,45 +92,47 @@ async function run() {
         })
 
 
-        app.get("/allOrderedCoffees", async(req, res)=>{
+        app.get("/allOrderedCoffees", async (req, res) => {
             const result = await orders.find().toArray();
             res.send(result)
         })
-        app.get("/orderCoffee/:email", async(req, res)=>{
+        app.get("/orderCoffee/:email", async (req, res) => {
             const email = req.params.email;
-            const result = await orders.find({customerEmail : email}).toArray();
+            const result = await orders.find({ customerEmail: email }).toArray();
             res.send(result)
         })
 
-        app.put('/updateOrder/:id', async(req, res)=>{
+        app.put('/updateOrder/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = {_id : new ObjectId(id)};
+            const filter = { _id: new ObjectId(id) };
             const options = { upsert: true };
             const newOrder = {
-                $set :{
-                    status : "Confirm"
+                $set: {
+                    status: "Confirm"
                 }
             }
             const result = await orders.updateOne(filter, newOrder, options);
             res.send(result);
         })
 
-
-
-        app.delete('/addcoffee/:id', async (req, res) => {
+        app.delete('/cancelOrder/:id', async (req, res) => {
             const id = req.params.id;
-            const result = await coffee.deleteOne({ _id: new ObjectId(id) });
+            const result = await orders.deleteOne({ _id: new ObjectId(id) });
             res.send(result)
         })
 
+
+
+
+
         // user info
 
-        app.get('/users', async(req, res)=>{
+        app.get('/users', async (req, res) => {
             const cursor = userCollection.find();
             const result = await cursor.toArray(cursor);
             res.send(result)
         })
-        
+
         app.get('/users/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email: email }
@@ -134,14 +142,14 @@ async function run() {
 
 
 
-        app.post('/users', async(req,res)=>{
-            const newUser =  req.body;
+        app.post('/users', async (req, res) => {
+            const newUser = req.body;
             console.log(newUser)
-            const {email} = newUser
+            const { email } = newUser
 
-            const isExists = await userCollection.findOne({email})
+            const isExists = await userCollection.findOne({ email })
 
-            if(isExists){
+            if (isExists) {
                 throw new Error("User Already Exists !")
             }
 
@@ -149,22 +157,22 @@ async function run() {
             res.send(result)
         })
 
-        app.delete('/users/:id', async(req ,res)=>{
+        app.delete('/users/:id', async (req, res) => {
             const id = req.params.id;
-            const result= await userCollection.deleteOne({_id: new ObjectId(id)});
+            const result = await userCollection.deleteOne({ _id: new ObjectId(id) });
             res.send(result)
         })
-        app.patch('/users', async(req,res)=>{
+        app.patch('/users', async (req, res) => {
             const user = req.body;
-            const filter = { email : user.email}
+            const filter = { email: user.email }
             const updated = {
-                $set : {
-                    lastloggedAt : user.lastloggedAt
+                $set: {
+                    lastloggedAt: user.lastloggedAt
                 }
             }
-            const result = await userCollection.updateOne(filter,updated)
+            const result = await userCollection.updateOne(filter, updated)
             res.send(result)
-            
+
         })
 
 
